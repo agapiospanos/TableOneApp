@@ -1,0 +1,103 @@
+html {
+    height: 100%;
+}
+
+.vars {
+    background: rgb(240, 240, 240);
+    padding: 30px 10px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.form-group.shiny-input-container {
+    margin: 0 auto;
+}
+
+.container-fluid {
+    margin: 0 auto;
+    display: block;
+    max-width: 600px;
+    background: white;
+    border-radius: 15px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.form-group.shiny-input-container {
+    margin-bottom: 15px;
+}
+
+img#logo {
+    max-width: 165px;
+    margin: 0 auto;
+    display: block;
+    margin-top: 15px;
+}
+
+body {
+    background: #6a5ccc;
+    background: -moz-linear-gradient(-45deg, #6a5ccc 0%, #9d4ed3 28%, #1279bc 70%, #3b6ac4 100%) fixed;
+    background: -webkit-linear-gradient(-45deg, #6a5ccc 0%,#9d4ed3 28%,#1279bc 70%,#3b6ac4 100%) fixed;
+    background: linear-gradient(135deg, #6a5ccc 0%,#9d4ed3 28%,#1279bc 70%,#3b6ac4 100%) fixed;
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6a5ccc', endColorstr='#3b6ac4',GradientType=1 );
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+h4 {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ececec;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+a#export_word {
+    margin: 10px auto;
+    display: block;
+    background: #518ec2;
+    border: 0;
+    color: white;
+    padding: 10px 30px;
+    width: 300px;
+}
+
+input.form-control[readonly="readonly"] {
+    padding: 19px;
+}
+
+.bottom-nav button {
+    margin: 10px 5px;
+}
+
+.bottom-nav {
+    text-align: center;
+}
+
+.btn-default {
+    background: #518ec2;
+    border: 0;
+    color: white;
+    padding: 10px 30px;
+}
+
+span.navbar-brand {
+    display: none;
+}
+
+nav {
+    display: none;
+}
+
+div#selected_cols {
+    width: 100%;
+}
+
+h6.error-message {
+    background: #7B0D1E;
+    color: white;
+    padding: 13px 20px;
+    text-align: center;
+    border-radius: 100px;
+    font-size: 15px;
+}
