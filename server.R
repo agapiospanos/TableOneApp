@@ -27,7 +27,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$sheet, {
-    removeUI(selector = ".gotab2")
+    removeUI(selector = ".gotab2", multiple = TRUE)
     insertUI(
       selector = "#gostep2",
       where = "beforeEnd",
@@ -44,7 +44,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$tab2_gotab1, {
     updateTabsetPanel(session, "NavBar", selected = "panel1")
-    removeUI(selector = ".gotab2")
+    removeUI(selector = ".gotab2", multiple = TRUE)
     insertUI(
       selector = "#gostep2",
       where = "beforeEnd",

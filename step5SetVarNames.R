@@ -3,7 +3,7 @@ step5SetVarNames <- function(input, output, session) {
   var_list <- input$selected_cols
   var_list_no_group <- var_list[!var_list %in% input$grouping_col]
 
-  removeUI(selector = "#var_names_container, .gotab4, .gotab6")
+  removeUI(selector = "#var_names_container, .gotab4, .gotab6", multiple = TRUE)
   
   insertUI(
     selector = "#var_names",

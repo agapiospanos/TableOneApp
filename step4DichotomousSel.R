@@ -1,5 +1,5 @@
 step4DichotomousSel <- function(input, output, session) {
-  removeUI(selector = "#dichotomous_cols, .gotab5")
+  removeUI(selector = "#dichotomous_cols, .gotab5, .gotab3", multiple = TRUE)
   
   var_list <- input$selected_cols
   var_list_no_group <- var_list[!var_list %in% input$grouping_col]
