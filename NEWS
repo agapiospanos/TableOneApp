@@ -1,0 +1,11 @@
+***TableOne Shiny App, version 0.2.2 ***
+
+- changed the version number to match the tableOne standalone R package version
+- added options for ordinal data
+- added option for median and IQR instead of mean and SD
+- updated GUI with better graphics
+- fixes for minor bugs
+
+***TableOne Shiny App, version 0.1.0 ***
+
+- basic functionality from tableOne package at: https://github.com/agapiospanos/tableone

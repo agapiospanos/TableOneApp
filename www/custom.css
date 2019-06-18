@@ -101,3 +101,112 @@ h6.error-message {
     border-radius: 100px;
     font-size: 15px;
 }
+
+.bootstrap-select>.dropdown-toggle {
+    color: #757575;
+    background: #f1f1f1;
+}
+
+.form-group.shiny-input-container.shiny-input-radiogroup.shiny-input-container-inline {
+    max-width: 300px;
+}
+
+button.btn.radiobtn.btn-default.active {
+    background: #518ec2;
+    color: white;
+}
+
+.dropdown.bootstrap-select.show-tick.form-control {
+    margin: 10px 0;
+}
+
+.btn-group-vertical.btn-group-container-sw {
+    margin: 0 auto;
+    display: block;
+}
+
+.radioGroupButtons .btn-group .btn {
+    background: #f1f1f1;
+    color: #757575;
+}
+
+.container-fluid.wide {
+    max-width: 1200px;
+}
+
+select,
+input[type="search"] {
+    border: none !important;
+    background: #f4f4f4;
+    padding: 5px 10px;
+    border-radius: 100px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    border: none !important;
+    background: #f4f4f4 !important;
+    border-radius: 100px;
+}
+
+button:focus,
+select:focus,
+input:focus {
+    outline:0;
+}
+
+.shiny-busy .loading-container {
+    visibility: visible;
+    display: block !important;
+}
+
+table.dataTable thead th, table.dataTable thead td,
+table.dataTable.no-footer {
+    border-color: #e2e2e2;
+}
+
+.footer-link {
+    position: relative;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.footer-link a {
+    text-decoration: none;
+}
+
+thead {
+    background: #518ec2;
+    border-radius: 5px;
+}
+
+thead th{
+    color: white;
+    font-weight: 200!important
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    border: none;
+}
+
+table.dataTable.no-footer {
+    border: none;
+    box-shadow: 0 0 10px #00000029;
+    margin: 20px 0;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: none;
+    display: inline-block;
+}
+
+table.dataTable.row-border tbody tr:first-child th, table.dataTable.row-border tbody tr:first-child td, table.dataTable.display tbody tr:first-child th, table.dataTable.display tbody tr:first-child td {
+    border-top: none;
+}
+
+table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.dataTable.display tbody th, table.dataTable.display tbody td {
+    border: none;
+}
+
+.version-number {
+    text-align: center;
+}

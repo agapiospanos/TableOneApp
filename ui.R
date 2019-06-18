@@ -1,12 +1,11 @@
 library(shiny)
 
 ui <- fluidPage(
+  shinyjs::useShinyjs(),
   
   theme = "custom.css",
   
-  # Application title
-  # titlePanel("TableOne App"),
-  img(id="logo", src = 'tableone-logo.png', align = "center"),
+  img(id = "logo", src = 'tableone-logo.png', align = "center"),
   
   tags$hr(),
   
@@ -15,6 +14,12 @@ ui <- fluidPage(
                       fluidRow(
                         column(
                           12,
+                          h4("Instructions"),
+                          p('In the excel file that you will use, please make sure that all the columns have names and there are not empty column names in the 1st row.'),
+                          p('If you experience any difficulties do not hesitate to contact us via the contact form in our website!'),
+                          a('https://esm.uoi.gr/en/contact-page/'),
+                          br(),
+                          br(),
                           h4("Choose an excel file"),
                           fileInput(
                             "excel_file",
@@ -42,11 +47,8 @@ ui <- fluidPage(
                           h4("Specify the grouping information"),
                           div(id = "grouping_list",  ""),
                           br(),
-                          # textInput("group_var_name", "Fill in the column name as it listed in excel", placeholder = "e.g. treatment"),
                           div(id = "treatment_var"),
                           div(id = "control_var"),
-                          # textInput("treatment_var", "Fill in the value that indicates the treatment group in the above specified column", placeholder = "e.g. 1"),
-                          # textInput("control_var", "Fill in the value that indicates the control group in the above specified column", placeholder = "e.g. 0"),
                           div(id = "step3nav", class = "bottom-nav")
                         )
                       )
@@ -61,26 +63,51 @@ ui <- fluidPage(
                         )
                       )
              ),
-             tabPanel("", value = "panel5",
+             tabPanel("", value = "panel5", 
+                      fluidRow(
+                        column(
+                          12,
+                          h4("Specify the ordinal variables"),
+                          div(id = "ordinal",  ""),
+                          div(id = "step5nav", class = "bottom-nav")
+                        )
+                      )
+             ),
+             tabPanel("", value = "panel6", 
+                      fluidRow(
+                        column(
+                          12,
+                          h4("Specify excel columns for Median and IQR"),
+                          div(id = "medianiqr",  ""),
+                          div(id = "step6nav", class = "bottom-nav")
+                        )
+                      )
+             ),
+             tabPanel("", value = "panel7",
                       fluidRow(
                         column(
                           12,
                           h4("Change the display names of the variables for the exported table"),
                           div(id = "var_names",  ""),
-                          div(id = "step5nav", class = "bottom-nav")
+                          div(id = "step7nav", class = "bottom-nav")
                         )
                       )
              ),
-             tabPanel("", value = "panel6",
+             tabPanel("", value = "panel8",
                       fluidRow(
                         column(
                           12,
-                          h4("Download the generated Word Document"),
+                          h4("This is the generated tableOne"),
+                          div(id = "table-display", ""),
                           br(),
+                          br(),
+                          h4("Download the generated Word Document"),
                           downloadButton("export_word", "Download TableOne Word Doc"),
-                          div(id = "step6nav", class = "bottom-nav")
+                          div(id = "step8nav", class = "bottom-nav")
                         )
                       )
              )
-  )
+  ),
+  includeHTML('www/loading.html'),
+  includeHTML('www/footer.html')
 )

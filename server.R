@@ -1,5 +1,9 @@
 library(shiny)
 library(readxl)
+library(shinyWidgets)
+library(shinycssloaders)
+library(DT)
+library(shinyjs)
 
 server <- function(input, output, session) {
   
@@ -9,13 +13,16 @@ server <- function(input, output, session) {
   source('step2ColSel.R', local = T)
   source('step3GroupSpecification.R', local = T)
   source('step4DichotomousSel.R', local = T)
-  source('step5SetVarNames.R', local = T)
-  source('step6OutputWord.R', local = T)
+  source('step5OrdinalSel.R', local = T)
+  source('step6SetMedianIqr.R', local = T)
+  source('step7SetVarNames.R', local = T)
+  source('step8OutputWord.R', local = T)
   
   rv <- reactiveValues(
     all_excel_cols = c(),
     var_list_no_group = c(),
-    var_names = c()
+    var_names = c(),
+    data_levels = c()
   )
 
   # ---------------------------------------- STEP 1 --------------------------------------------------------
@@ -27,7 +34,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$sheet, {
-    removeUI(selector = ".gotab2", multiple = TRUE)
+    removeUI(selector = "#tab1_gotab2")
     insertUI(
       selector = "#gostep2",
       where = "beforeEnd",
@@ -36,7 +43,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$tab1_gotab2, {
-    step2ColSel(input, output, session)
+    step2ColSel(input, output, session, rv)
     updateTabsetPanel(session, "NavBar", selected = "panel2")
   })
   
@@ -44,7 +51,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$tab2_gotab1, {
     updateTabsetPanel(session, "NavBar", selected = "panel1")
-    removeUI(selector = ".gotab2", multiple = TRUE)
+    removeUI(selector = "#tab1_gotab2")
     insertUI(
       selector = "#gostep2",
       where = "beforeEnd",
@@ -73,22 +80,29 @@ server <- function(input, output, session) {
     index_of_sel <- which(rv$all_excel_cols %in% input$grouping_col)
     data <- read_excel(input$excel_file$datapath, as.numeric(input$sheet), range = cell_cols(index_of_sel))
     data_levels <- levels(as.factor(unlist(data)))
+    rv$data_levels <- data_levels
     
-    removeUI(selector = "#control_val, #treatment_val", multiple = TRUE)
+    removeUI(selector = "#treatment_val, #control_val, #treatment_var .form-group, #control_var .form-group", multiple = TRUE)
     insertUI(
       selector = "#treatment_var",
       where = "afterBegin",
-      ui = radioButtons(inputId = "treatment_val", label = "Select treatment value", choices = data_levels, selected = character(0))
+      ui = radioGroupButtons(inputId = "treatment_val", label = "Select treatment group value", choices = data_levels, selected = character(0))
     )
+    
+  })
+  
+  observeEvent(input$treatment_val, {
+    removeUI(selector = "#control_val, #control_var .form-group", multiple = TRUE)
+    rest_data_levels <- rv$data_levels[-which(rv$data_levels == input$treatment_val)]
     insertUI(
       selector = "#control_var",
       where = "afterBegin",
-      ui = radioButtons(inputId = "control_val", label = "Select control value", choices = data_levels, selected = character(0))
+      ui = radioGroupButtons(inputId = "control_val", label = "Select control group value", choices = rest_data_levels, selected = character(0))
     )
   })
   
   observeEvent(input$control_val, {
-    removeUI(selector = ".gotab4", multiple = TRUE)
+    removeUI(selector = "#tab3_gotab4", multiple = TRUE)
     insertUI(
       selector = "#step3nav",
       where = "beforeEnd",
@@ -104,7 +118,7 @@ server <- function(input, output, session) {
   observeEvent(input$tab3_gotab4, {
     removeUI(selector = ".error-message", multiple = TRUE)
     if (length(input$grouping_col) > 0 & length(input$treatment_val) > 0 & length(input$control_val) > 0) {
-      step4DichotomousSel(input, output, session)
+      step4DichotomousSel(input, output, session, rv)
       updateTabsetPanel(session, "NavBar", selected = "panel4")
     } else {
       insertUI(
@@ -118,7 +132,7 @@ server <- function(input, output, session) {
   # ---------------------------------------- STEP 4 --------------------------------------------------------
   
   observeEvent(input$tab4_gotab5, {
-    step5SetVarNames(input, output, session)
+    step5OrdinalSel(input, output, session, rv)
     updateTabsetPanel(session, "NavBar", selected = "panel5")
   })
   
@@ -130,6 +144,30 @@ server <- function(input, output, session) {
   # ---------------------------------------- STEP 5 --------------------------------------------------------
   
   observeEvent(input$tab5_gotab6, {
+    step6SetMedianIqr(input, output, session, rv)
+    updateTabsetPanel(session, "NavBar", selected = "panel6")
+  })
+  
+  observeEvent(input$tab5_gotab4, {
+    removeUI(selector = ".error-message", multiple = TRUE)
+    updateTabsetPanel(session, "NavBar", selected = "panel4")
+  })
+  
+  # ---------------------------------------- STEP 6 --------------------------------------------------------
+  
+  observeEvent(input$tab6_gotab7, {
+    step7SetVarNames(input, output, session, rv)
+    updateTabsetPanel(session, "NavBar", selected = "panel7")
+  })
+  
+  observeEvent(input$tab6_gotab5, {
+    removeUI(selector = ".error-message", multiple = TRUE)
+    updateTabsetPanel(session, "NavBar", selected = "panel5")
+  })
+  
+  # ---------------------------------------- STEP 7 --------------------------------------------------------
+  
+  observeEvent(input$tab7_gotab8, {
     
     removeUI(selector = ".error-message", multiple = TRUE)
     all_fields_filled <- TRUE
@@ -146,11 +184,13 @@ server <- function(input, output, session) {
     rv$var_names <- var_names
     
     if (all_fields_filled) {
-      step6OutputWord(input, output, session)
-      updateTabsetPanel(session, "NavBar", selected = "panel6")
+      step8OutputWord(input, output, session, rv)
+      updateTabsetPanel(session, "NavBar", selected = "panel8")
+      
+      shinyjs::runjs(code = '$(".container-fluid").addClass("wide");')
     } else {
       insertUI(
-        selector = "#step5nav",
+        selector = "#step7nav",
         where = "beforeBegin",
         ui = h6(class = "error-message", "Please fill all the above fields!")
       )
@@ -158,19 +198,19 @@ server <- function(input, output, session) {
     
   })
   
-  observeEvent(input$tab5_gotab4, {
+  observeEvent(input$tab7_gotab6, {
     removeUI(selector = ".error-message", multiple = TRUE)
-    updateTabsetPanel(session, "NavBar", selected = "panel4")
+    updateTabsetPanel(session, "NavBar", selected = "panel6")
   })
   
-  # ---------------------------------------- STEP 6 --------------------------------------------------------
+  # ---------------------------------------- STEP 8 --------------------------------------------------------
   
-  observeEvent(input$tab6_gotab5, {
+  observeEvent(input$tab8_gotab7, {
     removeUI(selector = ".error-message", multiple = TRUE)
-    updateTabsetPanel(session, "NavBar", selected = "panel5")
+    updateTabsetPanel(session, "NavBar", selected = "panel7")
   })
   
-  observeEvent(input$tab6_reset, {
-    js$reset()
+  observeEvent(input$tab8_reset, {
+    shinyjs::runjs(code = 'location.reload();')
   })
 }

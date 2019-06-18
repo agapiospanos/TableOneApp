@@ -1,5 +1,6 @@
-step4DichotomousSel <- function(input, output, session) {
-  removeUI(selector = "#dichotomous_cols, .gotab5, .gotab3", multiple = TRUE)
+step4DichotomousSel <- function(input, output, session, rv) {
+  
+  removeUI(selector = "#dichotomous .form-group, #tab4_gotab3, #tab4_gotab5", multiple = TRUE)
   
   var_list <- input$selected_cols
   var_list_no_group <- var_list[!var_list %in% input$grouping_col]
@@ -8,7 +9,7 @@ step4DichotomousSel <- function(input, output, session) {
   insertUI(
     selector = "#dichotomous",
     where = "beforeEnd",
-    ui = checkboxGroupInput("dichotomous_cols", "Select the excel columns that contains dichotomous values", var_list_no_group)
+    ui = pickerInput("dichotomous_cols","Select the excel columns that contains dichotomous values", choices = var_list_no_group, options = list(`actions-box` = TRUE), multiple = T)
   ) 
   
   insertUI(
