@@ -1,3 +1,7 @@
+***TableOne Shiny App, version 0.2.3 ***
+
+- added note for variables when continuity correction is applied
+
 ***TableOne Shiny App, version 0.2.2 ***
 
 - changed the version number to match the tableOne standalone R package version

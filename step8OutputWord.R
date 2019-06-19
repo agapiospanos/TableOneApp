@@ -42,7 +42,19 @@ step8OutputWord <- function(input, output, session, rv) {
         ui = DT::dataTableOutput("dataframetable")
       )
       
-      output$dataframetable <- DT::renderDataTable(dataframetable, server = FALSE)
+      output$dataframetable <- DT::renderDataTable(dataframetable$table, server = FALSE)
+      
+      browser()
+      
+      if (dataframetable$continuity_correction) {
+        insertUI(
+          selector = "#continuity-correction",
+          where = "beforeEnd",
+          ui = p(paste('Note: Continuity correction was applied for the variables: ', paste(dataframetable$continuity_correction_vars, collapse = ', ')))
+        )
+      }
+      
+      browser()
     },
     error = function(e) {
       stop(safeError(e))

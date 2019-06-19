@@ -99,6 +99,7 @@ ui <- fluidPage(
                           12,
                           h4("This is the generated tableOne"),
                           div(id = "table-display", ""),
+                          div(id = "continuity-correction", ""),
                           br(),
                           br(),
                           h4("Download the generated Word Document"),
