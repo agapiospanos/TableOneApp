@@ -1,7 +1,14 @@
 step2ColSel <- function(input, output, session, rv) {
   
-  # importing data from the excel file
-  data <- read_excel(input$excel_file$datapath, as.numeric(input$sheet), n_max = 1)
+  # importing data from file
+  if (rv$filetype == 'csv') {
+    data <- as.data.frame(fread(file = input$excel_file$datapath))
+  } else {
+    data <- read_excel(input$excel_file$datapath, as.numeric(input$sheet))
+  }
+
+  # keeping the excel data in a global accessible var
+  rv$data <- data
   
   excel_cols <- names(data)
   

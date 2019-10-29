@@ -19,7 +19,7 @@ step8OutputWord <- function(input, output, session, rv) {
   
   tryCatch(
     {
-      dataframetable <- TableOne::tableone(
+      dataframetable <- tableone(
         import.col.names = rv$var_list_no_group,
         output.var.names = rv$var_names,
         dichotomous = input$dichotomous_cols,
@@ -28,7 +28,8 @@ step8OutputWord <- function(input, output, session, rv) {
         group.col.name = input$grouping_col,
         control.value = input$control_val,
         treatment.value = input$treatment_val,
-        excel.path = input$excel_file$datapath,
+        data = rv$data,
+        # excel.path = input$excel_file$datapath,
         export.path = tempdir(),
         sheet = as.numeric(input$sheet),
         # tableone.col.names = 
@@ -36,15 +37,13 @@ step8OutputWord <- function(input, output, session, rv) {
         # show.stats = 
       )
       
+      # create table
       insertUI(
         selector = "#table-display",
         where = "beforeEnd",
         ui = DT::dataTableOutput("dataframetable")
       )
-      
       output$dataframetable <- DT::renderDataTable(dataframetable$table, server = FALSE)
-      
-      browser()
       
       if (dataframetable$continuity_correction) {
         insertUI(
@@ -54,15 +53,28 @@ step8OutputWord <- function(input, output, session, rv) {
         )
       }
       
-      browser()
+      rv$tabledata <- dataframetable$tabledata
     },
     error = function(e) {
       stop(safeError(e))
     }
   )
   
+  # download word button
   output$export_word <- downloadHandler(
     filename = function() { "TableOneWord.docx" },
     content = function(file) { file.copy(paste0(tempdir(), '/', random_filename, '.docx'), file)}
+  )
+  
+  # download csv button
+  output$export_csv <- downloadHandler(
+    filename = function() { "TableOneData.csv" },
+    content = function(file) { write.csv(dataframetable, file) }
+  )
+  
+  # download xls button
+  output$export_xls <- downloadHandler(
+    filename = function() { "TableOneData.xlsx" },
+    content = function(file) { write_xlsx(as.data.frame(dataframetable), file, col_names = T, format_headers = T) }
   )
 }

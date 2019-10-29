@@ -2,6 +2,7 @@ step5OrdinalSel <- function(input, output, session, rv) {
   removeUI(selector = "#ordinal .form-group, #tab5_gotab4, #tab5_gotab6", multiple = TRUE)
   
   var_list_no_dich <- rv$var_list_no_group[!rv$var_list_no_group %in% input$dichotomous_cols]
+  rv$var_list_dichotomous <- rv$var_list_no_group[rv$var_list_no_group %in% input$dichotomous_cols]
   rv$var_list_no_dich <- var_list_no_dich
   
   insertUI(

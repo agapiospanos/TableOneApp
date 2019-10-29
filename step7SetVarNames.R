@@ -21,10 +21,25 @@ step7SetVarNames <- function(input, output, session, rv) {
   )
   
   for (i in 1:length(rv$var_list_no_group)) {
-    insertUI(
-      selector = "#var_names_container",
-      where = "beforeEnd",
-      ui = textInput(rv$var_list_no_group[i], paste("Name for", rv$var_list_no_group[i]), value = rv$var_list_no_group[i])
-    )
+    
+    thisvar <- rv$var_list_no_group[i]
+    
+    if (thisvar %in% rv$var_list_dichotomous) {
+      
+      val <- levels(as.factor(unlist(rv$data[thisvar])))
+      insertUI(
+        selector = "#var_names_container",
+        where = "beforeEnd",
+        ui = textInput(thisvar, paste("Name for", thisvar, '( for value: ', val[2], ')'), value = paste0(thisvar, '-', val[2]))
+      )
+      
+    } else {
+      
+      insertUI(
+        selector = "#var_names_container",
+        where = "beforeEnd",
+        ui = textInput(thisvar, paste("Name for", thisvar), value = thisvar)
+      )
+    }
   }
 }

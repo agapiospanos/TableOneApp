@@ -1,4 +1,5 @@
 library(shiny)
+library(plotly)
 
 ui <- fluidPage(
   shinyjs::useShinyjs(),
@@ -15,7 +16,7 @@ ui <- fluidPage(
                         column(
                           12,
                           h4("Instructions"),
-                          p('In the excel file that you will use, please make sure that all the columns have names and there are not empty column names in the 1st row.'),
+                          p('In the file that you will use, please make sure that all the columns have names and there are not empty column names in the 1st row.'),
                           p('If you experience any difficulties do not hesitate to contact us via the contact form in our website!'),
                           a('https://esm.uoi.gr/en/contact-page/'),
                           br(),
@@ -23,8 +24,8 @@ ui <- fluidPage(
                           h4("Choose an excel file"),
                           fileInput(
                             "excel_file",
-                            "Please choose the excel file that contains the data",
-                            accept = c(".xlsx", ".xls")
+                            "Please choose the excel file that contains the data (.csv, .xlsx, .xls)",
+                            accept = c(".xlsx", ".xls", ".csv")
                           ),
                           div(id = "sheet_select"),
                           div(id = "gostep2", class = "bottom-nav")
@@ -100,11 +101,30 @@ ui <- fluidPage(
                           h4("This is the generated tableOne"),
                           div(id = "table-display", ""),
                           div(id = "continuity-correction", ""),
+                          actionButton(inputId = "tab8graphs", class = "tab8gographs", label = "Create graphs from data"),
                           br(),
                           br(),
-                          h4("Download the generated Word Document"),
-                          downloadButton("export_word", "Download TableOne Word Doc"),
+                          h4("Download results"),
+                          downloadButton("export_word", "Download TableOne in word format (.docx)"),
+                          downloadButton("export_xls", "Download .xlsx file"),
+                          downloadButton("export_csv", "Download .csv file"),
                           div(id = "step8nav", class = "bottom-nav")
+                        )
+                      )
+             ),
+             tabPanel("", value = "panel9",
+                      fluidRow(
+                        column(
+                          12,
+                          h4("Select variable to create a graph"),
+                          div(id = "graph_selector", ""),
+                          div(id = "graphvar1_selector", ""),
+                          div(id = "graphvar2_selector", ""),
+                          plotlyOutput("plot1"),
+                          plotlyOutput("plot2"),
+                          br(),
+                          br(),
+                          div(id = "step9nav", class = "bottom-nav")
                         )
                       )
              )

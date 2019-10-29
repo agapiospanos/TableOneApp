@@ -52,14 +52,12 @@ h4 {
     margin-top: 0;
 }
 
-a#export_word {
+a#export_word, a#export_xls, a#export_csv {
     margin: 10px auto;
-    display: block;
     background: #518ec2;
     border: 0;
     color: white;
     padding: 10px 30px;
-    width: 300px;
 }
 
 input.form-control[readonly="readonly"] {
@@ -185,13 +183,13 @@ thead th{
 }
 
 table.dataTable thead th, table.dataTable thead td {
-    border: none;
+    border: none !important;
 }
 
 table.dataTable.no-footer {
-    border: none;
+    border: none !important;
     box-shadow: 0 0 10px #00000029;
-    margin: 20px 0;
+    margin: 20px 0 !important;
 }
 
 .dataTables_wrapper .dataTables_length {
@@ -200,11 +198,15 @@ table.dataTable.no-footer {
 }
 
 table.dataTable.row-border tbody tr:first-child th, table.dataTable.row-border tbody tr:first-child td, table.dataTable.display tbody tr:first-child th, table.dataTable.display tbody tr:first-child td {
-    border-top: none;
+    border-top: none !important;
 }
 
 table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.dataTable.display tbody th, table.dataTable.display tbody td {
-    border: none;
+    border: none !important;
+}
+
+.dataTables_wrapper .dataTables_length {
+    margin-bottom: 20px;
 }
 
 .version-number {

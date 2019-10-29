@@ -1,3 +1,15 @@
+***TableOne Shiny App, version 0.2.5 ***
+
+- added plots at the last step
+- added option for uploading csv files as well
+- added option to download analysis data in csv and excel file
+- added description next to dichotomous variables to know which value they represent in the analysis data
+
+***TableOne Shiny App, version 0.2.4 ***
+
+- integrated the table one functions in the app. No need for tableOne package to be installed separately
+- added Mann Whitney test instead of t-test for continuous data when you select median and IQR
+
 ***TableOne Shiny App, version 0.2.3 ***
 
 - added note for variables when continuity correction is applied

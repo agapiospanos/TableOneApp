@@ -2,6 +2,8 @@ step6SetMedianIqr <- function(input, output, session, rv) {
   removeUI(selector = "#medianiqr .form-group, #tab6_gotab5, #tab6_gotab7", multiple = TRUE)
   
   var_list_cont <- rv$var_list_no_group[!rv$var_list_no_group %in% c(input$dichotomous_cols, input$ordinal_cols)]
+  rv$var_list_continuous <- var_list_cont
+  rv$var_list_ordinal <- input$ordinal_cols
   
   insertUI(
     selector = "#medianiqr",
