@@ -1,3 +1,11 @@
+***TableOne Shiny App, version 0.2.6 ***
+
+- added demo data (Tsivgoulis_2019.xls) Tsivgoulis G, Kargiotis O, Katsanos AH, et al. Incidence, characteristics and outcomes in patients with embolic stroke of undeterminedsource: a population-based study. J Neurol Sci 2019;401:5-11.
+- added options to export the analysis data in case the user wants to further process them.
+- updated graphs to display the information better.
+- minor UI fixes and bug fixes regarding the UX.
+- code refactoring for easier understanding.
+
 ***TableOne Shiny App, version 0.2.5 ***
 
 - added plots at the last step

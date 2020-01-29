@@ -9,6 +9,15 @@ html {
     border-radius: 10px;
 }
 
+.example-buttons button {
+    display: inline-block;
+}
+
+.example-buttons {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
 .form-group.shiny-input-container {
     margin: 0 auto;
 }
@@ -27,7 +36,7 @@ html {
     margin-bottom: 15px;
 }
 
-img#logo {
+#logo {
     max-width: 165px;
     margin: 0 auto;
     display: block;
@@ -52,7 +61,7 @@ h4 {
     margin-top: 0;
 }
 
-a#export_word, a#export_xls, a#export_csv {
+#export_word, a#export_xls, a#export_csv {
     margin: 10px auto;
     background: #518ec2;
     border: 0;
@@ -87,7 +96,7 @@ nav {
     display: none;
 }
 
-div#selected_cols {
+#selected_cols {
     width: 100%;
 }
 
@@ -211,4 +220,8 @@ table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.
 
 .version-number {
     text-align: center;
+}
+
+#plot1, #plot2 {
+    height: auto !important;
 }

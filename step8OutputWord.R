@@ -1,3 +1,22 @@
+step8EventObservers <- function(input, output, rv, session) {
+  # Back button
+  observeEvent(input$tab8_gotab7, {
+    removeUI(selector = ".error-message", multiple = TRUE)
+    updateTabsetPanel(session, "NavBar", selected = "panel7")
+  })
+  
+  # Reset Button
+  observeEvent(input$tab8_reset, {
+    shinyjs::runjs(code = 'location.reload();')
+  })
+  
+  # Graphs button
+  observeEvent(input$tab8graphs, {
+    updateTabsetPanel(session, "NavBar", selected = "panel9")
+    step9Graphs(input, output, session, rv)
+  })
+}
+
 step8OutputWord <- function(input, output, session, rv) {
   
   removeUI( selector = ".tab8_reset, #tab8_gotab7", multiple = TRUE)
@@ -14,6 +33,7 @@ step8OutputWord <- function(input, output, session, rv) {
     ui = actionButton(inputId = "tab8_reset", class = "tab8_reset", label = "Reset")
   )
 
+  # Creating a random filename for the generated file.
   a <- do.call(paste0, replicate(10, sample(LETTERS, 1, TRUE), FALSE))
   random_filename <- paste0(a, sprintf("%04d", sample(9999, 1, TRUE)), sample(LETTERS, 1, TRUE))
   
@@ -31,7 +51,7 @@ step8OutputWord <- function(input, output, session, rv) {
         data = rv$data,
         # excel.path = input$excel_file$datapath,
         export.path = tempdir(),
-        sheet = as.numeric(input$sheet),
+        sheet = as.numeric(rv$sheet),
         # tableone.col.names = 
         export.filename = random_filename
         # show.stats = 
@@ -60,21 +80,33 @@ step8OutputWord <- function(input, output, session, rv) {
     }
   )
   
-  # download word button
+  # download table one word button
   output$export_word <- downloadHandler(
     filename = function() { "TableOneWord.docx" },
     content = function(file) { file.copy(paste0(tempdir(), '/', random_filename, '.docx'), file)}
   )
   
-  # download csv button
+  # download table one csv button
   output$export_csv <- downloadHandler(
     filename = function() { "TableOneData.csv" },
-    content = function(file) { write.csv(dataframetable, file) }
+    content = function(file) { write.csv(dataframetable$table, file) }
   )
   
-  # download xls button
+  # download table one xls button
   output$export_xls <- downloadHandler(
     filename = function() { "TableOneData.xlsx" },
-    content = function(file) { write_xlsx(as.data.frame(dataframetable), file, col_names = T, format_headers = T) }
+    content = function(file) { write_xlsx(as.data.frame(dataframetable$table), file, col_names = T, format_headers = T) }
+  )
+  
+  # download analysis data csv button
+  output$export_data_csv <- downloadHandler(
+    filename = function() { "TableOneAnalysisData.csv" },
+    content = function(file) { write.csv(dataframetable$tabledata, file) }
+  )
+  
+  # download analysis_data xls button
+  output$export_data_xls <- downloadHandler(
+    filename = function() { "TableOneAnalysisData.xlsx" },
+    content = function(file) { write_xlsx(as.data.frame(dataframetable$tabledata), file, col_names = T, format_headers = T) }
   )
 }

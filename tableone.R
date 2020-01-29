@@ -79,8 +79,8 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
   
   # checking if the user specified custom column names for the exported table
   if (is.null(tableone.col.names)) {
-    tableone.col.names <- c('Variable', 'Treatment Group', 'Control Group', 'p-value')
-    colname.ind <- 5
+    tableone.col.names <- c('Variable', 'Treatment Group', 'Control Group')
+    colname.ind <- 4
     if ("MD" %in% stats) {
       tableone.col.names[colname.ind] <- 'Mean Difference'
       colname.ind <- colname.ind + 1
@@ -91,7 +91,10 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
     }
     if ("test-value" %in% stats) {
       tableone.col.names[colname.ind] <- 'Test Stat.'
+      colname.ind <- colname.ind + 1
     }
+    tableone.col.names[colname.ind] <- 'p value'
+
   } else {
     if (length(tableone.col.names) < 4 + dataframe.ncols) {
       stop(paste('you must provide a vector with', 4 + dataframe.ncols, 'column names for the argument tableone.col.names. Use " " inside the vector to keep empty column names'))
@@ -112,10 +115,10 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
   padding <- 0
   
   # tabledata to keep all the results separately
-  tabledata <- data.frame( matrix( ncol = 28, nrow = length(output.var.names) ) )
+  tabledata <- data.frame( matrix( ncol = 31, nrow = length(output.var.names) ) )
 
   # column names for tabledata
-  names(tabledata) <- c('name.display', 'name.var', 'type', 't.percent', 't.mean', 't.sd', 't.median', 't.q1', 't.q3', 't.min', 't.max', 'c.percent', 'c.mean', 'c.sd', 'c.median', 'c.q1', 'c.q3', 'c.min', 'c.max', 'p.value', 'md', 'md.ci.low', 'md.ci.upper', 'or', 'or.ci.low', 'or.ci.high', 'test.stat', 'ordinal.levels')
+  names(tabledata) <- c('name.display', 'name.var', 'type', 't.count', 't.percent', 't.mean', 't.sd', 't.median', 't.q1', 't.q3', 't.min', 't.max', 'c.count', 'c.percent', 'c.mean', 'c.sd', 'c.median', 'c.q1', 'c.q3', 'c.min', 'c.max', 'md', 'md.ci.low', 'md.ci.upper', 'or', 'or.ci.low', 'or.ci.high', 'test.stat', 'ordinal.levels', 'p.value', 'continuity.correction')
   
   # generating the table that will be exported
   for (i in 1:length(import.col.names)) {
@@ -162,12 +165,15 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
       c.events <- length(which(unlist(control[i]) == c.f2name))
       c.no_events <- length(which(unlist(control[i]) == c.f1name))
       
+      continuity_correction_this_var <- F
+      
       if (t.events == 0 | c.events == 0 | t.no_events == 0 | c.no_events == 0) {
         t.events = t.events + 0.5
         c.events = c.events + 0.5
         t.no_events = t.no_events + 0.5
         c.no_events = c.no_events + 0.5
         continuity_correction = T
+        continuity_correction_this_var <- T
         continuity_correction_vars <- cbind(continuity_correction_vars, varname)
       }
       
@@ -184,57 +190,62 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
       
       table.to.export[padding + i, 1] <- paste(varname, '(%)')
       # treatment group value - percentage
-      table.to.export[padding + i, 2] <- paste0(format(round(t.f2percent*100, digits = 2), nsmall = 2), '%') # we use f2percent because we have the 2nd factor as the baseline.
+      table.to.export[padding + i, 2] <- paste0(t.f2count, ' (', format(round(t.f2percent*100, digits = 2), nsmall = 2), '%)') # we use f2percent because we have the 2nd factor as the baseline.
       # control group value - percentage
-      table.to.export[padding + i, 3] <- paste0(format(round(c.f2percent*100, digits = 2), nsmall = 2), '%')
-      # p-value
-      table.to.export[padding + i, 4] <- format(pval, nsmall = 3)
+      table.to.export[padding + i, 3] <- paste0(c.f2count, ' (', format(round(c.f2percent*100, digits = 2), nsmall = 2), '%)')
       
       # get a start value for the column index as we dynamically show statistics
-      col.ind = 5
+      col.ind = 4
       
       if ("MD" %in% stats) {
         # mean difference with 95 percent confidence interval
-        table.to.export[padding + i,col.ind] <- ''
+        table.to.export[padding + i, col.ind] <- ''
         col.ind <- col.ind + 1
       }
       if ("OR" %in% stats) {
         # odds ratio - 95 percent OR confidence interval
-        table.to.export[padding + i,col.ind] <- paste0(format(round(or.value, digits = 2), nsmall = 2), ' [', format(round(exp(logor.ci.lower), digits = 2), nsmall = 2), ', ', format(round(exp(logor.ci.upper), digits = 2), nsmall = 2), ']')
+        table.to.export[padding + i, col.ind] <- paste0(format(round(or.value, digits = 2), nsmall = 2), ' [', format(round(exp(logor.ci.lower), digits = 2), nsmall = 2), ', ', format(round(exp(logor.ci.upper), digits = 2), nsmall = 2), ']')
         col.ind <- col.ind + 1
       }
       if ("test-value" %in% stats) {
-        table.to.export[padding + i,col.ind] <- format(testval, nsmall = 3)
+        table.to.export[padding + i, col.ind] <- format(testval, nsmall = 3)
+    	col.ind <- col.ind + 1 
       }
+      # p-value
+      table.to.export[padding + i, col.ind] <- format(pval, nsmall = 3)
       
-      tabledata[padding + i,1]  <- varname
-      tabledata[padding + i,3]  <- 'dichotomous'
-      tabledata[padding + i,4]  <- format(round(t.f2percent*100, digits = 2), nsmall = 2)
-      tabledata[padding + i,5]  <- ''
-      tabledata[padding + i,6]  <- ''
-      tabledata[padding + i,7]  <- ''
-      tabledata[padding + i,8]  <- ''
-      tabledata[padding + i,9]  <- ''
-      tabledata[padding + i,10] <- ''
-      tabledata[padding + i,11] <- ''
-      tabledata[padding + i,12] <- format(round(c.f2percent*100, digits = 2), nsmall = 2)
-      tabledata[padding + i,13] <- ''
-      tabledata[padding + i,14] <- ''
-      tabledata[padding + i,15] <- ''
-      tabledata[padding + i,16] <- ''
-      tabledata[padding + i,17] <- ''
-      tabledata[padding + i,18] <- ''
-      tabledata[padding + i,19] <- ''
-      tabledata[padding + i,20] <- pval
-      tabledata[padding + i,21] <- format(round(or.value, digits = 2), nsmall = 2)
-      tabledata[padding + i,22] <- ''
-      tabledata[padding + i,23] <- ''
-      tabledata[padding + i,24] <- ''
-      tabledata[padding + i,25] <- format(round(exp(logor.ci.lower), digits = 2), nsmall = 2)
-      tabledata[padding + i,26] <- format(round(exp(logor.ci.upper), digits = 2), nsmall = 2)
-      tabledata[padding + i,27] <- format(testval, nsmall = 3)
-      tabledata[padding + i,28] <- ''
-      
+      tabledata[padding + i,1]  <- varname # the variable name as we defined it for display
+      # tabledata[padding + i,2] is name.var - the original variable name. Assigned above.
+      tabledata[padding + i,3]  <- 'dichotomous' # variable type
+      tabledata[padding + i,4]  <- t.f2count # the treatment group count
+      tabledata[padding + i,5]  <- format(round(t.f2percent*100, digits = 2), nsmall = 2) # treatment percent
+      tabledata[padding + i,6]  <- '' # treatment mean
+      tabledata[padding + i,7]  <- '' # treatment sd
+      tabledata[padding + i,8]  <- '' # treatment median
+      tabledata[padding + i,9]  <- '' # treatment q1
+      tabledata[padding + i,10] <- '' # treatment q3
+      tabledata[padding + i,11] <- '' # treatment min value
+      tabledata[padding + i,12] <- '' # treatment max value
+      tabledata[padding + i,13] <- c.f2count # the control group count
+      tabledata[padding + i,14] <- format(round(c.f2percent*100, digits = 2), nsmall = 2) # control percent
+      tabledata[padding + i,15] <- '' # control mean
+      tabledata[padding + i,16] <- '' # control sd
+      tabledata[padding + i,17] <- '' # control median
+      tabledata[padding + i,18] <- '' # control q1
+      tabledata[padding + i,19] <- '' # control q3
+      tabledata[padding + i,20] <- '' # control min value
+      tabledata[padding + i,21] <- '' # control max value
+      tabledata[padding + i,22] <- '' # mean difference
+      tabledata[padding + i,23] <- '' # mean difference ci lower
+      tabledata[padding + i,24] <- '' # mean difference ci upper
+      tabledata[padding + i,25] <- format(round(or.value, digits = 2), nsmall = 2) # odds ratio
+      tabledata[padding + i,26] <- format(round(exp(logor.ci.lower), digits = 2), nsmall = 2) # odds ratio ci lower
+      tabledata[padding + i,27] <- format(round(exp(logor.ci.upper), digits = 2), nsmall = 2) # odds ratio ci upper
+      tabledata[padding + i,28] <- format(testval, nsmall = 3) # test statistic value
+      tabledata[padding + i,29] <- '' # ordinal levels
+      tabledata[padding + i,30] <- pval # p value
+      tabledata[padding + i,31] <- continuity_correction_this_var # showing the boolean continuity correction
+
     } else if (import.col.names[i] %in% ordinal) {
       
       test.values <- chisq.test(unlist(imported_data[import.col.names[i]]), unlist(group))
@@ -254,11 +265,8 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
       pval <- format(round(test.values$p.value, digits = 3), nsmall = 3)
       if (pval < 0.001) pval <- '<0.001'
       
-      # p-value
-      table.to.export[padding + i, 4] <- pval
-      
       # get a start value for the column index as we dynamically show statistics
-      col.ind = 5
+      col.ind = 4
       
       if ("MD" %in% stats) {
         # mean difference with 95 percent confidence interval
@@ -272,35 +280,42 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
       }
       if ("test-value" %in% stats) {
         table.to.export[padding + i, col.ind] <- format(round(test.values$statistic, digits = 3), nsmall = 3)
+        col.ind <- col.ind + 1
       }
+      # p-value
+      table.to.export[padding + i, col.ind] <- pval
       
-      tabledata[padding + i,1]  <- output.var.names[i]
-      tabledata[padding + i,3]  <- 'ordinal'
-      tabledata[padding + i,4]  <- ''
-      tabledata[padding + i,5]  <- ''
-      tabledata[padding + i,6]  <- ''
-      tabledata[padding + i,7]  <- ''
-      tabledata[padding + i,8]  <- ''
-      tabledata[padding + i,9]  <- ''
-      tabledata[padding + i,10] <- ''
-      tabledata[padding + i,11] <- ''
-      tabledata[padding + i,12] <- ''
-      tabledata[padding + i,13] <- ''
-      tabledata[padding + i,14] <- ''
-      tabledata[padding + i,15] <- ''
-      tabledata[padding + i,16] <- ''
-      tabledata[padding + i,17] <- ''
-      tabledata[padding + i,18] <- ''
-      tabledata[padding + i,19] <- ''
-      tabledata[padding + i,20] <- pval
-      tabledata[padding + i,21] <- ''
-      tabledata[padding + i,22] <- ''
-      tabledata[padding + i,23] <- ''
-      tabledata[padding + i,24] <- ''
-      tabledata[padding + i,25] <- ''
-      tabledata[padding + i,26] <- ''
-      tabledata[padding + i,27] <- format(testval, nsmall = 3)
-      tabledata[padding + i,28] <- length(var.levels)
+      tabledata[padding + i,1]  <- output.var.names[i] # the variable name as we defined it for display
+      # tabledata[padding + i,2] is name.var - the original variable name. Assigned above.
+      tabledata[padding + i,3]  <- 'ordinal' # the variable type
+      tabledata[padding + i,4]  <- '' # treatment count
+      tabledata[padding + i,5]  <- '' # treatment percent
+      tabledata[padding + i,6]  <- '' # treatment mean
+      tabledata[padding + i,7]  <- '' # treatment standard deviation
+      tabledata[padding + i,8]  <- '' # treatment median
+      tabledata[padding + i,9]  <- '' # treatment q1
+      tabledata[padding + i,10] <- '' # treatment q3
+      tabledata[padding + i,11] <- '' # treatment min value
+      tabledata[padding + i,12] <- '' # treatment max value
+      tabledata[padding + i,13] <- '' # control count
+      tabledata[padding + i,14] <- '' # control percent
+      tabledata[padding + i,15] <- '' # control mean
+      tabledata[padding + i,16] <- '' # control standard deviation
+      tabledata[padding + i,17] <- '' # control median
+      tabledata[padding + i,18] <- '' # control q1
+      tabledata[padding + i,19] <- '' # control q3
+      tabledata[padding + i,20] <- '' # control min value
+      tabledata[padding + i,21] <- '' # control max value
+      tabledata[padding + i,22] <- '' # mean difference
+      tabledata[padding + i,23] <- '' # mean difference ci lower
+      tabledata[padding + i,24] <- '' # mean difference ci upper
+      tabledata[padding + i,25] <- '' # odds ratio
+      tabledata[padding + i,26] <- '' # odds ratio ci lower
+      tabledata[padding + i,27] <- '' # odds ratio ci upper
+      tabledata[padding + i,28] <- format(testval, nsmall = 3) # test statistic value
+      tabledata[padding + i,29] <- length(var.levels) # ordinal levels
+      tabledata[padding + i,30] <- pval # p value
+      tabledata[padding + i,31] <- '' # continuity correction - we specify it only for dichotomous data
       
       # we add a row for each factor of the ordinal data
       for (k in 1:length(var.levels)) {
@@ -308,42 +323,46 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
         # name for the factor
         table.to.export[padding + i, 1] <- paste0('---- level: ', var.levels[k])
         # treatment group value stays empty for the ordinal data
-        table.to.export[padding + i, 2] <- paste0(format(round((t.count[k] / n.t) * 100, digits = 2), nsmall = 2), '%')
+        table.to.export[padding + i, 2] <- paste0(t.count[k], ' (', format(round((t.count[k] / n.t) * 100, digits = 2), nsmall = 2), '%)')
         # control group value stays empty as well
-        table.to.export[padding + i, 3] <- paste0(format(round((c.count[k] / n.c) * 100, digits = 2), nsmall = 2), '%')
+        table.to.export[padding + i, 3] <- paste0(c.count[k], ' (', format(round((c.count[k] / n.c) * 100, digits = 2), nsmall = 2), '%)')
         # other columns will be empty
         table.to.export[padding + i, 4] <- ''
         table.to.export[padding + i, 5] <- ''
         table.to.export[padding + i, 6] <- ''
         table.to.export[padding + i, 7] <- ''
         
-        tabledata[padding + i,1]  <- paste0('---- level: ', var.levels[k])
-        tabledata[padding + i,3]  <- 'ordinal-level'
-        tabledata[padding + i,4]  <- format(round((t.count[k] / n.t) * 100, digits = 2), nsmall = 2)
-        tabledata[padding + i,5]  <- ''
-        tabledata[padding + i,6]  <- ''
-        tabledata[padding + i,7]  <- ''
-        tabledata[padding + i,8]  <- ''
-        tabledata[padding + i,9]  <- ''
-        tabledata[padding + i,10] <- ''
-        tabledata[padding + i,11] <- ''
-        tabledata[padding + i,12] <- format(round((c.count[k] / n.c) * 100, digits = 2), nsmall = 2)
-        tabledata[padding + i,13] <- ''
-        tabledata[padding + i,14] <- ''
-        tabledata[padding + i,15] <- ''
-        tabledata[padding + i,16] <- ''
-        tabledata[padding + i,17] <- ''
-        tabledata[padding + i,18] <- ''
-        tabledata[padding + i,19] <- ''
-        tabledata[padding + i,20] <- ''
-        tabledata[padding + i,21] <- ''
-        tabledata[padding + i,22] <- ''
-        tabledata[padding + i,23] <- ''
-        tabledata[padding + i,24] <- ''
-        tabledata[padding + i,25] <- ''
-        tabledata[padding + i,26] <- ''
-        tabledata[padding + i,27] <- ''
-        tabledata[padding + i,28] <- ''
+        tabledata[padding + i,1]  <- paste0('---- level: ', var.levels[k]) # the variable name as we defined it for display
+        # tabledata[padding + i,2] is name.var - the original variable name. Assigned above.
+        tabledata[padding + i,3]  <- 'ordinal-level' # the variable type
+        tabledata[padding + i,4]  <- t.count[k] # treatment count
+        tabledata[padding + i,5]  <- format(round((t.count[k] / n.t) * 100, digits = 2), nsmall = 2) # treatment percent
+        tabledata[padding + i,6]  <- '' # treatment mean
+        tabledata[padding + i,7]  <- '' # treatment sd
+        tabledata[padding + i,8]  <- '' # treatment median
+        tabledata[padding + i,9]  <- '' # treatment q1
+        tabledata[padding + i,10] <- '' # treatment q3
+        tabledata[padding + i,11] <- '' # treatment min value
+        tabledata[padding + i,12] <- '' # treatment max value
+        tabledata[padding + i,13]  <- c.count[k] # control count
+        tabledata[padding + i,14] <- format(round((c.count[k] / n.c) * 100, digits = 2), nsmall = 2) # control percent
+        tabledata[padding + i,15] <- '' # control mean
+        tabledata[padding + i,16] <- '' # control sd
+        tabledata[padding + i,17] <- '' # control median
+        tabledata[padding + i,18] <- '' # control q1
+        tabledata[padding + i,19] <- '' # control q3
+        tabledata[padding + i,20] <- '' # control min value
+        tabledata[padding + i,21] <- '' # control max value
+        tabledata[padding + i,22] <- '' # mean difference
+        tabledata[padding + i,23] <- '' # mean difference ci lower 
+        tabledata[padding + i,24] <- '' # mean difference ci upper
+        tabledata[padding + i,25] <- '' # odds ratio
+        tabledata[padding + i,26] <- '' # odds ratio ci lower
+        tabledata[padding + i,27] <- '' # odds ratio ci upper
+        tabledata[padding + i,28] <- '' # test statistic value
+        tabledata[padding + i,29] <- '' # ordinal levels
+        tabledata[padding + i,30] <- '' # p value
+        tabledata[padding + i,31] <- '' # continuity correction - we specify it only for dichotomous data
       }
       
     } else { # continuous data case
@@ -351,7 +370,7 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
       wilcox.res <- wilcox.test(as.numeric(unlist(imported_data[import.col.names[i]]))~unlist(group), imported_data, alternative = "two.sided")
       t.test.res <- t.test(as.numeric(unlist(imported_data[import.col.names[i]]))~unlist(group), imported_data)
       
-      # calculating quantiles and median for control and treatment group even if the user has not selected the median iqr for this variable so that we can export the data to tabledata var
+      # NOTE: calculating quantiles and median for control and treatment group even if the user has not selected the median iqr for this variable so that we can export the data to tabledata var
       c.q25 <- quantile(as.numeric(unlist(control[i])), na.rm = T)[2]
       c.q75 <- quantile(as.numeric(unlist(control[i])), na.rm = T)[4]
       
@@ -360,6 +379,18 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
       
       c.median <- median(as.numeric(unlist(control[i])), na.rm = T)
       t.median <- median(as.numeric(unlist(treatment[i])), na.rm = T)
+      
+      # NOTE: for the same reason (exporting to tabledata) we always calculating the mean and sd values.
+      test.values <- t.test.res
+      
+      # mean for control and treatment group
+      c.mean <- test.values$estimate[1]
+      t.mean <- test.values$estimate[2]
+      mean.difference <- c.mean - t.mean
+      
+      # standard deviation for control and treament group
+      c.sd <- round(sd(as.numeric(unlist(control[i])), na.rm = T), digits = 2)
+      t.sd <- round(sd(as.numeric(unlist(treatment[i])), na.rm = T), digits = 2)
       
       if (import.col.names[i] %in% median.iqr) {
         
@@ -372,28 +403,7 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
         # control group value with standard deviation
         table.to.export[padding + i, 3] <- paste0(c.median, ' (', c.q25, ',', c.q75, ')')
         
-        tabledata[padding + i,4]  <- ''
-        tabledata[padding + i,5]  <- ''
-        
-        tabledata[padding + i,12] <- ''
-        tabledata[padding + i,13] <- ''
-        
-        tabledata[padding + i,20] <- ''
-        tabledata[padding + i,21] <- ''
-        tabledata[padding + i,22] <- ''
-        
       } else {
-        
-        test.values <- t.test.res
-        
-        # mean for control and treatment group
-        c.mean <- test.values$estimate[1]
-        t.mean <- test.values$estimate[2]
-        mean.difference <- c.mean - t.mean
-        
-        # standard deviation for control and treament group
-        c.sd <- round(sd(as.numeric(unlist(control[i])), na.rm = T), digits = 2)
-        t.sd <- round(sd(as.numeric(unlist(treatment[i])), na.rm = T), digits = 2)
         
         # column name
         table.to.export[padding + i, 1] <- paste0(output.var.names[i], ' (mean, sd)')
@@ -402,27 +412,14 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
         # control group value with standard deviation
         table.to.export[padding + i, 3] <- paste0(format(round(c.mean, digits = 2), nsmall = 2), '\U00B1', format(c.sd, nsmall = 2))
         
-        tabledata[padding + i,5]  <- format(round(t.mean, digits = 2), nsmall = 2)
-        tabledata[padding + i,6]  <- t.sd
-        
-        tabledata[padding + i,13] <- format(round(c.mean, digits = 2), nsmall = 2)
-        tabledata[padding + i,14] <- c.sd
-        
-        tabledata[padding + i,21] <- format(round(mean.difference, digits = 2), nsmall = 2)
-        tabledata[padding + i,22] <- format(round(test.values$conf.int[1], digits = 2), nsmall = 2)
-        tabledata[padding + i,23] <- format(round(test.values$conf.int[2], digits = 2), nsmall = 2)
-        
       }
       
       # p-value
       pval <- round(test.values$p.value, digits = 3)
       if (pval < 0.001) pval <- '<0.001'
       
-      # p-value
-      table.to.export[padding + i, 4] <- format(pval, nsmall = 3)
-      
       # get a start value for the column index as we dynamically show statistics
-      col.ind = 5
+      col.ind = 4
       
       if ("MD" %in% stats) {
         if (import.col.names[i] %in% median.iqr) {
@@ -440,32 +437,43 @@ tableone <- function(import.col.names, output.var.names, dichotomous = c(), ordi
       }
       if ("test-value" %in% stats) {
         table.to.export[padding + i, col.ind] <- format(round(test.values$statistic, digits = 3), nsmall = 3)
+        col.ind <- col.ind + 1
       }
       
-      tabledata[padding + i,1]  <- output.var.names[i]
-      tabledata[padding + i,3]  <- 'continuous'
-      tabledata[padding + i,4]  <- ''
+      # p-value
+      table.to.export[padding + i, col.ind] <- format(pval, nsmall = 3)
       
-      tabledata[padding + i,7]  <- t.median
-      tabledata[padding + i,8]  <- t.q25
-      tabledata[padding + i,9]  <- t.q75
-      tabledata[padding + i,10] <- as.numeric(min(unlist(treatment[i])))
-      tabledata[padding + i,11] <- as.numeric(max(unlist(treatment[i])))
-      tabledata[padding + i,12] <- ''
-      
-      tabledata[padding + i,15] <- c.median
-      tabledata[padding + i,16] <- c.q25
-      tabledata[padding + i,17] <- c.q75
-      tabledata[padding + i,18] <- as.numeric(min(unlist(control[i])))
-      tabledata[padding + i,19] <- as.numeric(max(unlist(control[i])))
-      
-      tabledata[padding + i,20] <- pval
-      
-      tabledata[padding + i,24] <- ''
-      tabledata[padding + i,25] <- ''
-      tabledata[padding + i,26] <- ''
-      tabledata[padding + i,27] <- format(round(test.values$statistic, digits = 3), nsmall = 3)
-      tabledata[padding + i,28] <- ''
+      tabledata[padding + i,1]  <- output.var.names[i] # the variable name as we defined it for display
+      # tabledata[padding + i,2] is name.var - the original variable name. Assigned above.
+      tabledata[padding + i,3]  <- 'continuous' # variable type
+      tabledata[padding + i,4]  <- '' # treatment count
+      tabledata[padding + i,5]  <- '' # treatment percent
+      tabledata[padding + i,6]  <- format(round(t.mean, digits = 2), nsmall = 2) # treatment mean
+      tabledata[padding + i,7]  <- t.sd # treatment sd
+      tabledata[padding + i,8]  <- t.median # treatment median
+      tabledata[padding + i,9]  <- t.q25 # treatment q1
+      tabledata[padding + i,10]  <- t.q75 # treatment q3
+      tabledata[padding + i,11] <- as.numeric(min(unlist(treatment[i]))) # treatment min value
+      tabledata[padding + i,12] <- as.numeric(max(unlist(treatment[i]))) # treatment max value
+      tabledata[padding + i,13] <- '' # control count
+      tabledata[padding + i,14] <- '' # control percent
+      tabledata[padding + i,15] <- format(round(c.mean, digits = 2), nsmall = 2) # control mean
+      tabledata[padding + i,16] <- c.sd # control sd
+      tabledata[padding + i,17] <- c.median # control median
+      tabledata[padding + i,18] <- c.q25 # control q1
+      tabledata[padding + i,19] <- c.q75 # control q3
+      tabledata[padding + i,20] <- as.numeric(min(unlist(control[i]))) # control min value
+      tabledata[padding + i,21] <- as.numeric(max(unlist(control[i]))) # control max value
+      tabledata[padding + i,22] <- format(round(mean.difference, digits = 2), nsmall = 2) # mean difference
+      tabledata[padding + i,23] <- format(round(test.values$conf.int[1], digits = 2), nsmall = 2) # mean difference ci lower
+      tabledata[padding + i,24] <- format(round(test.values$conf.int[2], digits = 2), nsmall = 2) # mean difference ci upper
+      tabledata[padding + i,25] <- '' # odds ratio
+      tabledata[padding + i,26] <- '' # odds ratio ci lower
+      tabledata[padding + i,27] <- '' # odds ratio ci upper
+      tabledata[padding + i,28] <- format(round(test.values$statistic, digits = 3), nsmall = 3) # test statistic value
+      tabledata[padding + i,29] <- '' # ordinal levels
+      tabledata[padding + i,30] <- pval # p value
+      tabledata[padding + i,31] <- '' # continuity correction - we specify it only for dichotomous data
     }
   }
   

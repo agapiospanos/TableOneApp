@@ -11,6 +11,9 @@ ui <- fluidPage(
   tags$hr(),
   
   navbarPage("", id = "NavBar",
+             
+             # ------------------------------------------- STEP 1 --------------------------------------------------
+             
              tabPanel("", value = "panel1",
                       fluidRow(
                         column(
@@ -28,10 +31,22 @@ ui <- fluidPage(
                             accept = c(".xlsx", ".xls", ".csv")
                           ),
                           div(id = "sheet_select"),
-                          div(id = "gostep2", class = "bottom-nav")
+                          div(id = "gostep2", class = "bottom-nav"),
+                          br(),
+                          h4("Or use the example data"),
+                          div(class = "example-buttons",
+                            actionButton(inputId = "use_example", class = "use_example", label = "Use Example"),
+                            downloadButton("download_example", class = "download_example", label = "Download Example Data"),
+                          ),
+                          p('Example data reference:'),
+                          a('Tsivgoulis G, Kargiotis O, Katsanos AH, et al. Incidence, characteristics and outcomes in patients with embolic stroke of undeterminedsource: a population-based study. J Neurol Sci 2019;401:5-11.', href='https://www.sciencedirect.com/science/article/abs/pii/S0022510X19301650')
+                          
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 2 --------------------------------------------------
+             
              tabPanel("", value = "panel2",
                       fluidRow(
                         column(
@@ -41,6 +56,9 @@ ui <- fluidPage(
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 3 --------------------------------------------------
+             
              tabPanel("", value = "panel3",
                       fluidRow(
                         column(
@@ -54,6 +72,9 @@ ui <- fluidPage(
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 4 --------------------------------------------------
+             
              tabPanel("", value = "panel4", 
                       fluidRow(
                         column(
@@ -64,6 +85,9 @@ ui <- fluidPage(
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 5 --------------------------------------------------
+             
              tabPanel("", value = "panel5", 
                       fluidRow(
                         column(
@@ -74,6 +98,9 @@ ui <- fluidPage(
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 6 --------------------------------------------------
+             
              tabPanel("", value = "panel6", 
                       fluidRow(
                         column(
@@ -84,6 +111,9 @@ ui <- fluidPage(
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 7 --------------------------------------------------
+             
              tabPanel("", value = "panel7",
                       fluidRow(
                         column(
@@ -94,6 +124,9 @@ ui <- fluidPage(
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 8 --------------------------------------------------
+             
              tabPanel("", value = "panel8",
                       fluidRow(
                         column(
@@ -104,14 +137,22 @@ ui <- fluidPage(
                           actionButton(inputId = "tab8graphs", class = "tab8gographs", label = "Create graphs from data"),
                           br(),
                           br(),
-                          h4("Download results"),
-                          downloadButton("export_word", "Download TableOne in word format (.docx)"),
-                          downloadButton("export_xls", "Download .xlsx file"),
-                          downloadButton("export_csv", "Download .csv file"),
+                          h4("Download TableOne"),
+                          downloadButton("export_word", "Word file (.docx)"),
+                          downloadButton("export_xls", "Excel file (.xlsx)"),
+                          downloadButton("export_csv", "CSV file (.csv)"),
+                          br(),
+                          br(),
+                          h4("Download Analysis Data"),
+                          downloadButton("export_data_xls", "Excel file (.xlsx)"),
+                          downloadButton("export_data_csv", "CSV file (.csv)"),
                           div(id = "step8nav", class = "bottom-nav")
                         )
                       )
              ),
+             
+             # ------------------------------------------- STEP 9 --------------------------------------------------
+             
              tabPanel("", value = "panel9",
                       fluidRow(
                         column(

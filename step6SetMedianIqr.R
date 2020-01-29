@@ -1,3 +1,17 @@
+step6EventObservers <- function(input, output, rv, session) {
+  # Next button
+  observeEvent(input$tab6_gotab7, {
+    step7SetVarNames(input, output, session, rv)
+    updateTabsetPanel(session, "NavBar", selected = "panel7")
+  })
+  
+  # Back button
+  observeEvent(input$tab6_gotab5, {
+    removeUI(selector = ".error-message", multiple = TRUE)
+    updateTabsetPanel(session, "NavBar", selected = "panel5")
+  })
+}
+
 step6SetMedianIqr <- function(input, output, session, rv) {
   removeUI(selector = "#medianiqr .form-group, #tab6_gotab5, #tab6_gotab7", multiple = TRUE)
   
